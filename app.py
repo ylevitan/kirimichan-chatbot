@@ -74,11 +74,15 @@ qa_chain = ConversationalRetrievalChain.from_llm(
 
 @app.get("/")
 def home():
-    return {"message": "Kirimichan API is online"}
+    return {"message": "Kirimichan API is online!"}
 
+# Chatbot route (THIS must exist too)
 @app.post("/chat")
 async def chat(request: Request):
     data = await request.json()
     query = data.get("query")
+
+    # Assume you have qa_chain ready
     response = qa_chain.run(query)
+
     return JSONResponse(content={"response": response})
