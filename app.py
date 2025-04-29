@@ -10,6 +10,10 @@ from langchain_community.chat_models import ChatOpenAI
 from langchain.chains import ConversationalRetrievalChain
 from langchain.memory import ConversationBufferMemory
 from langchain.prompts import PromptTemplate
+from fastapi import FastAPI, Request
+from fastapi.responses import JSONResponse
+
+app = FastAPI()
 
 # === ENV: Your OpenAI key ===
 os.environ["OPENAI_API_KEY"] = "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"
@@ -68,7 +72,9 @@ qa_chain = ConversationalRetrievalChain.from_llm(
     combine_docs_chain_kwargs={"prompt": custom_template, "document_variable_name": "context"},
 )
 
-app = FastAPI()
+@app.get("/")
+def home():
+    return {"message": "Kirimichan API is online"}
 
 @app.post("/chat")
 async def chat(request: Request):
