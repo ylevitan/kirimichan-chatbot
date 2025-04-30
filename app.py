@@ -16,7 +16,7 @@ from fastapi.responses import JSONResponse
 app = FastAPI()
 
 # === ENV: Your OpenAI key ===
-os.environ["OPENAI_API_KEY"] = "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"
+os.environ["OPENAI_API_KEY"] = "sk-proj-FgkPDWD0aXKy9j3LC3tPf8soGQwTR3vB6TpHv2Y8HnfzM72FOSAtUgazv23tUzw1hIGq1q6Y2T3BlbkFJng0kQ6B0tPMswhvi30RADPubXc9zacScE9XMqgiZ81mLgLzAw6js5WvA2bQtfjNTpDEZLUehYA"
 
 # Load index
 faiss_index = faiss.read_index("index/index.faiss")
