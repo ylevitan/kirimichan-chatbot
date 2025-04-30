@@ -89,3 +89,8 @@ async def chat(request: Request):
     response = qa_chain.run(query)
 
     return JSONResponse(content={"response": response})
+
+
+if __name__ == "__main__":
+    port = int(os.environ.get("PORT", 10000))  # Render provides PORT env variable
+    uvicorn.run("app:app", host="0.0.0.0", port=port, reload=False)
