@@ -6,6 +6,8 @@ import os
 from langchain_community.vectorstores import FAISS
 from langchain_community.docstore.in_memory import InMemoryDocstore
 from langchain_community.embeddings import SentenceTransformerEmbeddings
+from langchain_huggingface import HuggingFaceEmbeddings
+
 from langchain_community.chat_models import ChatOpenAI
 from langchain.chains import ConversationalRetrievalChain
 from langchain.memory import ConversationBufferMemory
@@ -29,7 +31,9 @@ faiss_index = faiss.read_index("index/index.faiss")
 with open("index/index_meta.pkl", "rb") as f:
     docstore, id_map = pickle.load(f)
 
-embedding_model = SentenceTransformerEmbeddings(model_name="all-MiniLM-L6-v2")
+#embedding_model = SentenceTransformerEmbeddings(model_name="all-MiniLM-L6-v2")
+embedding_model = HuggingFaceEmbeddings(model_name="sentence-transformers/all-MiniLM-L6-v2")
+
 
 vectorstore = FAISS(
     embedding_function=embedding_model,
