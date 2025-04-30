@@ -12,11 +12,14 @@ from langchain.memory import ConversationBufferMemory
 from langchain.prompts import PromptTemplate
 from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
+import openai
+
+openai.api_key = os.getenv("OPENAI_API_KEY")
 
 app = FastAPI()
 
 # === ENV: Your OpenAI key ===
-os.environ["OPENAI_API_KEY"] = "sk-proj-FgkPDWD0aXKy9j3LC3tPf8soGQwTR3vB6TpHv2Y8HnfzM72FOSAtUgazv23tUzw1hIGq1q6Y2T3BlbkFJng0kQ6B0tPMswhvi30RADPubXc9zacScE9XMqgiZ81mLgLzAw6js5WvA2bQtfjNTpDEZLUehYA"
+#os.environ["OPENAI_API_KEY"] = "sk-proj-FgkPDWD0aXKy9j3LC3tPf8soGQwTR3vB6TpHv2Y8HnfzM72FOSAtUgazv23tUzw1hIGq1q6Y2T3BlbkFJng0kQ6B0tPMswhvi30RADPubXc9zacScE9XMqgiZ81mLgLzAw6js5WvA2bQtfjNTpDEZLUehYA"
 
 # Load index
 faiss_index = faiss.read_index("index/index.faiss")
