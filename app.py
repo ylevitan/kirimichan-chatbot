@@ -13,8 +13,11 @@ from langchain.prompts import PromptTemplate
 from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
 import openai
+from dotenv import load_dotenv
+load_dotenv()
 
 openai.api_key = os.getenv("OPENAI_API_KEY")
+print("OPENAI_API_KEY loaded:", os.getenv("OPENAI_API_KEY"))
 
 app = FastAPI()
 
@@ -23,7 +26,7 @@ app = FastAPI()
 
 # Load index
 faiss_index = faiss.read_index("index/index.faiss")
-with open("index_meta.pkl", "rb") as f:
+with open("index/index_meta.pkl", "rb") as f:
     docstore, id_map = pickle.load(f)
 
 embedding_model = SentenceTransformerEmbeddings(model_name="all-MiniLM-L6-v2")
@@ -65,7 +68,7 @@ Answer as Kirimichan:
 )
 
 
-llm = ChatOpenAI(model_name="gpt-4", temperature=0.95)
+llm = ChatOpenAI(model_name="gpt-4", temperature=0.95, openai_api_key=os.getenv("OPENAI_API_KEY"))
 memory = ConversationBufferMemory(memory_key="chat_history", return_messages=True)
 
 qa_chain = ConversationalRetrievalChain.from_llm(
