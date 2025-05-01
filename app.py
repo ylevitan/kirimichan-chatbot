@@ -15,18 +15,29 @@ load_dotenv()
 
 app = FastAPI()
 
+import json
+from langchain.docstore.document import Document
+from langchain_community.docstore.in_memory import InMemoryDocstore
+
 # Load FAISS index
-index = faiss.read_index("index/index.faiss")
-with open("index/index_meta.pkl", "rb") as f:
-    docstore, id_map = pickle.load(f)
+faiss_index = faiss.read_index("index/index.faiss")
 
-embeddings = SentenceTransformerEmbeddings(model_name="all-MiniLM-L6-v2")
+# Load metadata from JSON
+with open("index/index_meta.json", "r", encoding="utf-8") as f:
+    meta = json.load(f)
 
+# Reconstruct docstore and id_map
+docstore = InMemoryDocstore({
+    k: Document(page_content=v["page_content"]) for k, v in meta["docstore"].items()
+})
+id_map = {int(k): v for k, v in meta["id_map"].items()}
+
+# Create vectorstore
 vectorstore = FAISS(
-    embedding_function=embeddings,
-    index=index,
+    embedding_function=embedding_model,
+    index=faiss_index,
     docstore=docstore,
-    index_to_docstore_id=id_map
+    index_to_docstore_id=id_map,
 )
 
 custom_prompt = PromptTemplate(
