@@ -8,4 +8,3 @@ langchain-core==0.1.53
 langchain-community==0.0.36
 langchain-openai==0.1.6
 pydantic==1.10.13
-openai==1.13.3
