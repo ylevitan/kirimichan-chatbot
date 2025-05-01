@@ -7,7 +7,7 @@ from dotenv import load_dotenv
 
 from langchain_community.vectorstores import FAISS
 from langchain_community.embeddings import SentenceTransformerEmbeddings
-from langchain_community.chat_models import ChatOpenAI
+from langchain_openai import ChatOpenAI
 from langchain.chains import ConversationalRetrievalChain
 from langchain.memory import ConversationBufferMemory
 from langchain.prompts import PromptTemplate
@@ -60,7 +60,9 @@ Answer:
 )
 
 # ✅ LLM + Memory + QA Chain
-llm = ChatOpenAI(model_name="gpt-4", temperature=0.8, openai_api_key=os.getenv("OPENAI_API_KEY"))
+#llm = ChatOpenAI(model_name="gpt-4", temperature=0.8, openai_api_key=os.getenv("OPENAI_API_KEY"))
+
+llm = ChatOpenAI(model="gpt-4", temperature=0.97)
 memory = ConversationBufferMemory(memory_key="chat_history", return_messages=True)
 
 qa_chain = ConversationalRetrievalChain.from_llm(
