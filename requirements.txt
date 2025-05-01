@@ -3,10 +3,7 @@ uvicorn==0.34.0
 python-dotenv==1.0.1
 faiss-cpu==1.7.4
 sentence-transformers==2.6.1
+# Keep these three aligned to avoid conflicts
 langchain==0.1.16
 langchain-community==0.0.36
-langchain-core==0.1.55
-langchain-huggingface==0.1.2
-openai==1.22.0
-pydantic==2.6.4
-pydantic-settings==2.2.1
+langchain-core==0.1.53
