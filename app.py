@@ -13,13 +13,16 @@ from langchain.memory import ConversationBufferMemory
 from langchain.prompts import PromptTemplate
 from langchain.docstore.document import Document
 from langchain_community.docstore.in_memory import InMemoryDocstore
+from langchain_openai import OpenAIEmbeddings
+
 
 load_dotenv()
 
 app = FastAPI()
 
 # ✅ Define embedding_model early
-embedding_model = SentenceTransformerEmbeddings(model_name="all-MiniLM-L6-v2")
+embedding_model = OpenAIEmbeddings()
+#embedding_model = SentenceTransformerEmbeddings(model_name="all-MiniLM-L6-v2")
 
 # ✅ Load FAISS index
 faiss_index = faiss.read_index("index/index.faiss")
