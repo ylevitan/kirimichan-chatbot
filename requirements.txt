@@ -1,10 +1,11 @@
-fastapi==0.100.0
-uvicorn==0.22.0
+fastapi==0.110.0
+uvicorn==0.29.0
 python-dotenv==1.0.1
 faiss-cpu==1.7.4
 sentence-transformers==2.2.2
-langchain==0.0.350
-langchain-community==0.0.30
-openai==1.13.3
-pydantic==1.10.13
+langchain==0.1.16
+langchain-core==0.1.53
+langchain-community==0.0.36
 langchain-openai==0.1.6
+pydantic==1.10.13
+openai==1.13.3
