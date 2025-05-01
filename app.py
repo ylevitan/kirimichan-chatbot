@@ -1,38 +1,40 @@
 from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
 import os
-import pickle
 import faiss
+import json
 from dotenv import load_dotenv
+
 from langchain_community.vectorstores import FAISS
 from langchain_community.embeddings import SentenceTransformerEmbeddings
-from langchain.chat_models import ChatOpenAI
+from langchain_community.chat_models import ChatOpenAI
 from langchain.chains import ConversationalRetrievalChain
 from langchain.memory import ConversationBufferMemory
 from langchain.prompts import PromptTemplate
+from langchain.docstore.document import Document
+from langchain_community.docstore.in_memory import InMemoryDocstore
 
 load_dotenv()
 
 app = FastAPI()
 
-import json
-from langchain.docstore.document import Document
-from langchain_community.docstore.in_memory import InMemoryDocstore
+# ✅ Define embedding_model early
+embedding_model = SentenceTransformerEmbeddings(model_name="all-MiniLM-L6-v2")
 
-# Load FAISS index
+# ✅ Load FAISS index
 faiss_index = faiss.read_index("index/index.faiss")
 
-# Load metadata from JSON
+# ✅ Load metadata from JSON
 with open("index/index_meta.json", "r", encoding="utf-8") as f:
     meta = json.load(f)
 
-# Reconstruct docstore and id_map
+# ✅ Reconstruct docstore and id_map
 docstore = InMemoryDocstore({
     k: Document(page_content=v["page_content"]) for k, v in meta["docstore"].items()
 })
 id_map = {int(k): v for k, v in meta["id_map"].items()}
 
-# Create vectorstore
+# ✅ Create vectorstore
 vectorstore = FAISS(
     embedding_function=embedding_model,
     index=faiss_index,
@@ -40,6 +42,7 @@ vectorstore = FAISS(
     index_to_docstore_id=id_map,
 )
 
+# ✅ Prompt
 custom_prompt = PromptTemplate(
     input_variables=["context", "question"],
     template="""
@@ -56,6 +59,7 @@ Answer:
 """
 )
 
+# ✅ LLM + Memory + QA Chain
 llm = ChatOpenAI(model_name="gpt-4", temperature=0.8, openai_api_key=os.getenv("OPENAI_API_KEY"))
 memory = ConversationBufferMemory(memory_key="chat_history", return_messages=True)
 
@@ -66,6 +70,7 @@ qa_chain = ConversationalRetrievalChain.from_llm(
     combine_docs_chain_kwargs={"prompt": custom_prompt, "document_variable_name": "context"},
 )
 
+# ✅ Routes
 @app.get("/")
 def home():
     return {"message": "Kirimichan RAG API is alive!"}
