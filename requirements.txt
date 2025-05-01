@@ -7,3 +7,4 @@ sentence-transformers==2.6.1
 langchain==0.1.16
 langchain-community==0.0.36
 langchain-core==0.1.53
+langchain-huggingface==0.1.2
