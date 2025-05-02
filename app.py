@@ -14,6 +14,8 @@ from langchain.memory import ConversationBufferMemory
 from langchain.prompts import PromptTemplate
 from langchain.docstore.document import Document
 from langchain_community.docstore.in_memory import InMemoryDocstore
+from fastapi.middleware.cors import CORSMiddleware
+
 
 load_dotenv()
 
@@ -117,6 +119,16 @@ Answer:"""
         return JSONResponse(content={"response": response})
     except Exception as e:
         return JSONResponse(status_code=500, content={"error": f"RAG error: {str(e)}"})
+
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 
 
 # ✅ Main entry point for local or manual server start
