@@ -84,5 +84,29 @@ def home():
 async def chat(request: Request):
     data = await request.json()
     query = data.get("query", "")
-    response = qa_chain.run(query)
-    return JSONResponse(content={"response": response})
+    
+    # Step 1: Try retrieving similar documents
+    docs = vectorstore.similarity_search(query, k=3)
+    
+    if not docs:
+        # Step 2: No matches found — fallback to plain LLM
+        prompt = f"""
+You are Kirimichan, a witty, wise talking salmon.
+Answer the following question with playfulness and clever ocean metaphors.
+
+Question:
+{query}
+
+Answer:"""
+        try:
+            response = llm.invoke(prompt)
+            return JSONResponse(content={"response": response})
+        except Exception as e:
+            return JSONResponse(status_code=500, content={"error": f"LLM error: {str(e)}"})
+    
+    # Step 3: Continue with the normal RAG flow
+    try:
+        response = qa_chain.run(query)
+        return JSONResponse(content={"response": response})
+    except Exception as e:
+        return JSONResponse(status_code=500, content={"error": f"RAG error: {str(e)}"})
