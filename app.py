@@ -33,11 +33,10 @@ app.add_middleware(
 
 print("🟡 Starting Kirimichan server...")
 
-# Choose embedding model
+# Load embedding model
 embedding_model = OpenAIEmbeddings()
-# embedding_model = SentenceTransformerEmbeddings(model_name="all-MiniLM-L6-v2")
 
-# Load FAISS index
+# Load FAISS index and metadata
 vectorstore = None
 qa_chain = None
 
@@ -61,20 +60,19 @@ try:
     )
     print("✅ FAISS index loaded.")
 
-    # Define custom prompt
+    # 🐟 Custom Kirimichan prompt (no mood)
     custom_prompt = PromptTemplate(
-        input_variables=["context", "question", "mood"],
+        input_variables=["context", "question"],
         template="""
 You are Kirimichan 🐟 — a wisecracking salmon sashimi who escaped the sushi plate to become a globetrotting, storytelling, philosophy-dishing stand-up comic.
 
-Your tone adapts to the given **mood**:
-- "funny": Sushi puns, sarcasm
-- "inspiring": Poetic, deep sea wisdom
-- "dark": Existential, brutally honest
-- "silly": Absurd, helium-like
-- "wise": Zen/Sufi quotes with flair
+Always respond with:
+- Ocean metaphors
+- Wordplay and puns
+- Cheeky but smart tone
+- Deep sea Zen wisdom when needed
 
-Use ocean metaphors. Be wild, cheeky, and never boring.
+Use the following context to answer. If you don’t know, admit it with flair.
 
 Context:
 {context}
@@ -82,14 +80,11 @@ Context:
 Question:
 {question}
 
-Mood:
-{mood}
-
 Answer as Kirimichan:
 """
     )
 
-    # Build LLM and QA chain
+    # Build chain
     llm = ChatOpenAI(model="gpt-4", temperature=0.97)
     memory = ConversationBufferMemory(memory_key="chat_history", return_messages=True)
 
@@ -97,18 +92,21 @@ Answer as Kirimichan:
         llm=llm,
         retriever=vectorstore.as_retriever(search_type="similarity", k=3),
         memory=memory,
-        combine_docs_chain_kwargs={"prompt": custom_prompt, "document_variable_name": "context"},
+        combine_docs_chain_kwargs={
+            "prompt": custom_prompt,
+            "document_variable_name": "context"
+        },
     )
 
 except Exception as e:
     print("❌ Failed to load FAISS or chain:", e, file=sys.stderr)
 
-# Health check
+# Root health check
 @app.get("/")
 def home():
     return {"message": "Kirimichan RAG API is alive!"}
 
-# Debug endpoint
+# Debug info
 @app.get("/debug")
 def debug():
     return {
@@ -117,25 +115,23 @@ def debug():
         "openai_key_loaded": os.getenv("OPENAI_API_KEY") is not None
     }
 
-# Main chat endpoint
+# 🔄 Main chat endpoint
 @app.post("/chat")
 async def chat(request: Request):
     data = await request.json()
     query = data.get("query", "")
-    mood = data.get("mood", "funny")
 
     if not query:
         return JSONResponse(status_code=400, content={"error": "Missing 'query'"})
 
-    print(f"📩 Received query: {query} | Mood: {mood}")
+    print(f"📩 Received query: {query}")
 
     try:
         if vectorstore and qa_chain:
-            response = qa_chain.run({"question": query, "mood": mood})
+            response = qa_chain.invoke({"question": query})
         else:
             fallback_prompt = f"""You are Kirimichan, a wise and witty talking fish.
 Question: {query}
-Mood: {mood}
 Answer:"""
             response = ChatOpenAI(model="gpt-4", temperature=0.97).invoke(fallback_prompt)
 
