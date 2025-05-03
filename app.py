@@ -116,6 +116,7 @@ def debug():
     }
 
 # 🔄 Main chat endpoint
+
 @app.post("/chat")
 async def chat(request: Request):
     data = await request.json()
@@ -128,14 +129,17 @@ async def chat(request: Request):
 
     try:
         if vectorstore and qa_chain:
-            response = qa_chain.invoke({"question": query})
+            # ✅ Only return the answer string to avoid serializing chat history
+            result = qa_chain.invoke({"question": query})
+            answer = result["answer"]
         else:
+            # Fallback in case FAISS/vectorstore isn't loaded
             fallback_prompt = f"""You are Kirimichan, a wise and witty talking fish.
 Question: {query}
 Answer:"""
-            response = ChatOpenAI(model="gpt-4", temperature=0.97).invoke(fallback_prompt)
+            answer = ChatOpenAI(model="gpt-4", temperature=0.97).invoke(fallback_prompt)
 
-        return JSONResponse(content={"response": response})
+        return JSONResponse(content={"response": answer})
 
     except Exception as e:
         import traceback
