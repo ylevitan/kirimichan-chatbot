@@ -110,6 +110,8 @@ def home():
 async def chat(request: Request):
     data = await request.json()
     query = data.get("query", "")
+    mood = data.get("mood", "funny")  # 👈 Default mood
+
 
     if not query:
         return JSONResponse(status_code=400, content={"error": "Missing 'query'"})
